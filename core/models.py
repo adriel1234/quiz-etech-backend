@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ModelBase(models.Model):
-    id = models.BigIntegerField(db_column='id', primary_key=True)
+    id = models.BigAutoField(db_column='id', null=False, primary_key=True)
     created_at = models.DateTimeField(db_column='dt_created_at', auto_now_add=True)
     modified_at = models.DateTimeField(db_column='dt_modified_at', auto_now=True)
 
