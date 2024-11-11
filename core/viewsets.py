@@ -20,12 +20,6 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
     filterset_class = filters.QuestionGroupFilter
 
 
-class QuestionGroupQuestionViewSet(viewsets.ModelViewSet):
-    queryset = models.QuestionGroupQuestion.objects.all()
-    serializer_class = serializers.QuestionGroupQuestionSerializer
-    filterset_class = filters.QuestionGroupQuestionFilter
-
-
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = models.Match.objects.all()
     serializer_class = serializers.MatchSerializer

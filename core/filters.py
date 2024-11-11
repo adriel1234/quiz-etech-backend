@@ -39,15 +39,6 @@ class QuestionGroupFilter(filters.FilterSet):
         fields = ['description']
 
 
-class QuestionGroupQuestionFilter(filters.FilterSet):
-    question_group = filters.CharFilter(field_name='question_group__description', lookup_expr=LIKE)
-    question = filters.CharFilter(field_name='question__description', lookup_expr=LIKE)
-
-    class Meta:
-        model = models.QuestionGroupQuestion
-        fields = ['question_group', 'question']
-
-
 class MatchFilter(filters.FilterSet):
     description = filters.CharFilter(lookup_expr=LIKE)
     question_group = filters.CharFilter(field_name='question_group__description', lookup_expr=LIKE)

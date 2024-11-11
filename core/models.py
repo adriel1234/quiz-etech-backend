@@ -31,26 +31,18 @@ class Option(ModelBase):
 
 class QuestionGroup(ModelBase):
     description = models.CharField(db_column='tx_question_group', null=False, max_length=264)
+    questions_group_question = models.ManyToManyField(Question, db_table='question_group_question')
 
     class Meta:
         db_table = 'question_group'
         managed = True
 
 
-class QuestionGroupQuestion(ModelBase):
-    question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False,
-                                       on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, db_column='nb_id_question', null=False, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'question_group_question'
-        managed = True
-
-
 class Match(ModelBase):
     time_per_question = models.IntegerField(db_column='nb_time_per_question', null=False)  # TIME
     description = models.CharField(db_column='tx_description', null=False, max_length=264)
-    question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False)
+    question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False,
+                                       on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'match'
@@ -75,5 +67,5 @@ class MatchUser(ModelBase):
     wrong_questions = models.IntegerField(db_column='nb_wrong_questions', default=0)
 
     class Meta:
-        db_table = 'match'
+        db_table = 'match_user'
         managed = True

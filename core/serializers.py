@@ -20,12 +20,6 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         exclude = ['created_at']
 
 
-class QuestionGroupQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.QuestionGroupQuestion
-        exclude = ['created_at']
-
-
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Match
