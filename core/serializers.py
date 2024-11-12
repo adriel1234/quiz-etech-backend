@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from core import models
 
 
@@ -28,8 +29,9 @@ class MatchSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.User
-        exclude = ['created_at', 'password']
+        model = User
+        fields = ['username', 'password', 'email']
+        extra_kwargs = {'password': {'write_only': True}}
 
 
 class MatchUserSerializer(serializers.ModelSerializer):

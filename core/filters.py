@@ -1,4 +1,5 @@
 from django_filters import rest_framework as filters
+from django.contrib.auth.models import User
 from core import models
 
 # Filtro de pesquisa
@@ -50,16 +51,16 @@ class MatchFilter(filters.FilterSet):
 
 
 class UserFilter(filters.FilterSet):
-    login = filters.CharFilter(lookup_expr=LIKE)
+    username = filters.CharFilter(lookup_expr=LIKE)
     email = filters.CharFilter(lookup_expr=LIKE)
 
     class Meta:
-        model = models.User
-        fields = ['login', 'email']
+        model = User
+        fields = ['username', 'email']
 
 
 class MatchUserFilter(filters.FilterSet):
-    user = filters.CharFilter(field_name='user__login', lookup_expr=LIKE)
+    user = filters.CharFilter(field_name='user__username', lookup_expr=LIKE)
     match = filters.CharFilter(field_name='match__description', lookup_expr=LIKE)
     points = filters.CharFilter(field_name='points', lookup_expr=GTE)
     right_questions = filters.CharFilter(field_name='right_questions', lookup_expr=GTE)
