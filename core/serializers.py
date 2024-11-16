@@ -3,16 +3,24 @@ from django.contrib.auth.models import User
 from core import models
 
 
-class QuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Question
-        exclude = ['created_at']
-
-
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Option
-        exclude = ['created_at']
+        fields = ['description', 'correct']
+
+class QuestionSerializer(serializers.ModelSerializer):
+    options = OptionSerializer(many=True, write_only=True)
+
+    class Meta:
+        model = models.Question
+        fields = ['id', 'description', 'options']
+
+    def create(self, validated_data):
+        options_data = validated_data.pop('options')
+        question = models.Question.objects.create(**validated_data)
+        for option_data in options_data:
+            models.Option.objects.create(question=question, **option_data)
+        return question
 
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
