@@ -8,6 +8,7 @@ class OptionSerializer(serializers.ModelSerializer):
         model = models.Option
         fields = ['description', 'correct']
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True, write_only=True)
 
@@ -24,9 +25,34 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
+    questions_group_question = serializers.PrimaryKeyRelatedField(queryset=models.Question.objects.all(), many=True)
+
     class Meta:
         model = models.QuestionGroup
         exclude = ['created_at']
+
+    def create(self, validated_data):
+
+        questions_data = validated_data.pop('questions_group_question')
+
+        question_group = models.QuestionGroup.objects.create(**validated_data)
+
+        question_group.questions_group_question.set(questions_data)
+
+        return question_group
+
+    def update(self, instance, validated_data):
+
+        questions_data = validated_data.pop('questions_group_question', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if questions_data is not None:
+            instance.questions_group_question.set(questions_data)
+
+        return instance
 
 
 class MatchSerializer(serializers.ModelSerializer):
