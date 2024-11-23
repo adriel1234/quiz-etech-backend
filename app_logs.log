@@ -328,3 +328,62 @@ Unauthorized: /api/question-group/
 "GET /api/question-group/ HTTP/1.1" 401 183
 Unauthorized: /api/question-group/
 "GET /api/question-group/ HTTP/1.1" 401 183
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+Unauthorized: /api/question-group/
+"GET /api/question-group/ HTTP/1.1" 401 183
+"POST /api/token/ HTTP/1.1" 200 483
+"GET /api/question-group/ HTTP/1.1" 200 111
+"GET /api/question-group/ HTTP/1.1" 200 111
+"GET /api/question/ HTTP/1.1" 200 112
+Bad Request: /api/question-group/
+"POST /api/question-group/ HTTP/1.1" 400 50
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+Unauthorized: /api/question-group/
+"GET /api/question-group/ HTTP/1.1" 401 183
+"POST /api/token/ HTTP/1.1" 200 483
+"GET /api/question-group/ HTTP/1.1" 200 111
+"GET /api/question-group/ HTTP/1.1" 200 111
+"GET /api/question/ HTTP/1.1" 200 112
+"POST /api/question-group/ HTTP/1.1" 201 106
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /api/question-group/ HTTP/1.1" 200 218
+"GET /api/question/ HTTP/1.1" 200 112
+Bad Request: /api/question-group/
+"POST /api/question-group/ HTTP/1.1" 400 50
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question-group/ HTTP/1.1" 200 218
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /api/question-group/ HTTP/1.1" 200 218
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question/ HTTP/1.1" 200 112
+"POST /api/question-group/ HTTP/1.1" 201 118
+"GET /api/question-group/ HTTP/1.1" 200 337
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Projetos\etech\projeto-2-semestre\backend\quiz\core\viewsets.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /api/question-group/ HTTP/1.1" 200 337
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question-group/ HTTP/1.1" 200 337
+"GET /api/question/ HTTP/1.1" 200 112
+"POST /api/question-group/ HTTP/1.1" 201 125
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question-group/ HTTP/1.1" 200 463
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question/ HTTP/1.1" 200 112
+"GET /api/question-group/ HTTP/1.1" 200 463
+"GET /api/question/ HTTP/1.1" 200 112
+"OPTIONS /api/question-group/4/ HTTP/1.1" 200 0
+"DELETE /api/question-group/4/ HTTP/1.1" 204 0
+"GET /api/question-group/ HTTP/1.1" 200 337
