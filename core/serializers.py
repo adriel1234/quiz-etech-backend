@@ -1,6 +1,9 @@
-from rest_framework import serializers
+from rest_framework import serializers, request
 from django.contrib.auth.models import User
 from core import models
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class OptionSerializer(serializers.ModelSerializer):
@@ -17,11 +20,23 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = ['id', 'description', 'options']
 
     def create(self, validated_data):
-        options_data = validated_data.pop('options')
-        question = models.Question.objects.create(**validated_data)
-        for option_data in options_data:
-            models.Option.objects.create(question=question, **option_data)
-        return question
+        # Registra os dados validados
+        logger.info("Dados validados para criar o QuestionGroup: %s", validated_data)
+
+        # Extrai os IDs das questões do campo 'questions_group_question'
+        questions_data = validated_data.pop('questions_group_question')
+        logger.info("IDs das perguntas a serem associadas ao grupo de questões: %s", questions_data)
+
+        # Criando o grupo de questões (QuestionGroup)
+        question_group = models.QuestionGroup.objects.create(**validated_data)
+
+        # Associando as questões ao grupo
+        question_group.questions_group_question.set(questions_data)  # Associação de várias questões
+
+        # Log para confirmar a criação
+        logger.info("Grupo de questões criado com sucesso com ID: %d", question_group.id)
+
+        return question_group
 
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
@@ -29,31 +44,20 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.QuestionGroup
-        exclude = ['created_at']
+        fields = ['id', 'description', 'questions_group_question']
 
     def create(self, validated_data):
+        logger.info("Dados validados para criar o QuestionGroup: %s", validated_data)
 
         questions_data = validated_data.pop('questions_group_question')
+        logger.info("IDs das perguntas a serem associadas: %s", questions_data)
 
+        # Criando o grupo de perguntas
         question_group = models.QuestionGroup.objects.create(**validated_data)
+        question_group.questions_group_question.set(questions_data)  # Associando as questões ao grupo
 
-        question_group.questions_group_question.set(questions_data)
-
+        logger.info("Grupo de questões criado com sucesso com ID: %d", question_group.id)
         return question_group
-
-    def update(self, instance, validated_data):
-
-        questions_data = validated_data.pop('questions_group_question', None)
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        if questions_data is not None:
-            instance.questions_group_question.set(questions_data)
-
-        return instance
-
 
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
