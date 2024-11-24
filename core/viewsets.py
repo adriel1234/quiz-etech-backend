@@ -1,13 +1,7 @@
-from django_filters import OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions
 from django.contrib.auth.models import User
-from rest_framework.response import Response
 
 from core import models, serializers, filters
-import logging
-
-logger = logging.getLogger(__name__)
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = models.Question.objects.prefetch_related('options').all().order_by('id')
