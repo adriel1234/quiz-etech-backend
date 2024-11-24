@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class ModelBase(models.Model):
@@ -22,7 +23,7 @@ class Question(ModelBase):
 class Option(ModelBase):
     correct = models.BooleanField(db_column='tx_option_correct', null=False, default=False)
     description = models.CharField(db_column='tx_option_description', null=False, max_length=264)
-    question = models.ForeignKey(Question, db_column='nb_id_question', null=False, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, db_column='nb_id_question', null=False, on_delete=models.CASCADE, related_name='options')
 
     class Meta:
         db_table = 'option'
@@ -39,23 +40,12 @@ class QuestionGroup(ModelBase):
 
 
 class Match(ModelBase):
-    time_per_question = models.IntegerField(db_column='nb_time_per_question', null=False)  # TIME
+    time_per_question = models.IntegerField(db_column='nb_time_per_question', null=False)
     description = models.CharField(db_column='tx_description', null=False, max_length=264)
-    question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False,
-                                       on_delete=models.CASCADE)
+    question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'match'
-        managed = True
-
-
-class User(ModelBase):
-    login = models.CharField(db_column='tx_login', max_length=264, unique=True)
-    password = models.CharField(db_column='nb_password', max_length=128)
-    email = models.EmailField(db_column='tx_email', max_length=264, unique=True)
-
-    class Meta:
-        db_table = 'user'
         managed = True
 
 
