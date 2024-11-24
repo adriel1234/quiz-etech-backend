@@ -25,7 +25,7 @@ class OptionViewSet(viewsets.ModelViewSet):
 
 
 class QuestionGroupViewSet(viewsets.ModelViewSet):
-    queryset = models.QuestionGroup.objects.all()
+    queryset = models.QuestionGroup.objects.all().order_by('id')
     serializer_class = serializers.QuestionGroupSerializer
     filterset_class = filters.QuestionGroupFilter
     permission_classes = [permissions.IsAuthenticated]
