@@ -1,3 +1,5 @@
+from django_filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, status
 from django.contrib.auth.models import User
 from rest_framework.response import Response
@@ -8,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = models.Question.objects.prefetch_related('options').all()  # Agora 'options' é o relacionamento correto
+    queryset = models.Question.objects.prefetch_related('options').all().order_by('id')
     serializer_class = serializers.QuestionSerializer
     filterset_class = filters.QuestionFilter
     permission_classes = [permissions.IsAuthenticated]

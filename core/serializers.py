@@ -28,6 +28,33 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         return question
 
+    def update(self, instance, validated_data):
+        # Atualizar os dados da questão
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+
+        # Atualizar as opções
+        options_data = validated_data.pop('options', [])
+        existing_options = {opt.id: opt for opt in instance.options.all()}
+
+        for option_data in options_data:
+            option_id = option_data.get('id')
+            if option_id and option_id in existing_options:
+                # Atualizar uma opção existente
+                option = existing_options.pop(option_id)
+                option.description = option_data.get('description', option.description)
+                option.correct = option_data.get('correct', option.correct)
+                option.save()
+            else:
+                # Criar uma nova opção
+                models.Option.objects.create(question=instance, **option_data)
+
+        # Excluir opções que não estão na requisição
+        for option in existing_options.values():
+            option.delete()
+
+        return instance
+
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
     class Meta:
