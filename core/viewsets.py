@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = models.Question.objects.all()
+    queryset = models.Question.objects.prefetch_related('options').all()  # Agora 'options' é o relacionamento correto
     serializer_class = serializers.QuestionSerializer
     filterset_class = filters.QuestionFilter
     permission_classes = [permissions.IsAuthenticated]

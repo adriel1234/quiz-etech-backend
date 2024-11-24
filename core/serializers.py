@@ -8,18 +8,24 @@ class OptionSerializer(serializers.ModelSerializer):
         model = models.Option
         fields = ['description', 'correct']
 
+
 class QuestionSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True, write_only=True)
+    options = OptionSerializer(many=True)
 
     class Meta:
         model = models.Question
         fields = ['id', 'description', 'options']
 
     def create(self, validated_data):
+        # Remover as opções de validated_data para criar a questão
         options_data = validated_data.pop('options')
+        # Criar a instância de Question
         question = models.Question.objects.create(**validated_data)
+
+        # Criar as opções associadas à questão
         for option_data in options_data:
             models.Option.objects.create(question=question, **option_data)
+
         return question
 
 
