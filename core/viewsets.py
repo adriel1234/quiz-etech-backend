@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions
 from django.contrib.auth.models import User
+
 from core import models, serializers, filters
 
-
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = models.Question.objects.all()
+    queryset = models.Question.objects.prefetch_related('options').all().order_by('id')
     serializer_class = serializers.QuestionSerializer
     filterset_class = filters.QuestionFilter
 
@@ -17,8 +17,9 @@ class OptionViewSet(viewsets.ModelViewSet):
 
 
 
+
 class QuestionGroupViewSet(viewsets.ModelViewSet):
-    queryset = models.QuestionGroup.objects.all()
+    queryset = models.QuestionGroup.objects.all().order_by('id')
     serializer_class = serializers.QuestionGroupSerializer
     filterset_class = filters.QuestionGroupFilter
 

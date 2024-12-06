@@ -23,7 +23,7 @@ class Question(ModelBase):
 class Option(ModelBase):
     correct = models.BooleanField(db_column='tx_option_correct', null=False, default=False)
     description = models.CharField(db_column='tx_option_description', null=False, max_length=264)
-    question = models.ForeignKey(Question, db_column='nb_id_question', null=False, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, db_column='nb_id_question', null=False, on_delete=models.CASCADE, related_name='options')
 
     class Meta:
         db_table = 'option'
