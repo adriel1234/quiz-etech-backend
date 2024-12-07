@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from os.path import exists
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,6 +83,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "quiz.wsgi.application"
 
+ASGI_APPLICATION = 'quiz.asgi.application'
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -141,6 +144,16 @@ REST_FRAMEWORK = {
     ],
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Substitua pelo endereço do Redis
+        },
+    },
+}
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 
@@ -162,3 +175,7 @@ CORS_ALLOW_HEADERS = [
 
 # APPEND_SLASH = False
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}

@@ -40,6 +40,8 @@ class QuestionGroup(ModelBase):
 
 
 class Match(ModelBase):
+    is_active = models.BooleanField(default=True, db_column="bl_is_active", verbose_name="Partida Ativa")
+    code = models.CharField(max_length=10, unique=True, db_column="tx_code", verbose_name="Código da Sala")
     time_per_question = models.IntegerField(db_column='nb_time_per_question', null=False)
     description = models.CharField(db_column='tx_description', null=False, max_length=264)
     question_group = models.ForeignKey(QuestionGroup, db_column='nb_id_question_group', null=False, on_delete=models.CASCADE)

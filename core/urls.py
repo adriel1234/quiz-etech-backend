@@ -3,11 +3,11 @@ from core import viewsets
 
 router = routers.DefaultRouter()
 
-router.register('question', viewsets.QuestionViewSet)
-router.register('option', viewsets.OptionViewSet)
-router.register('question-group', viewsets.QuestionGroupViewSet)
-router.register('match', viewsets.MatchViewSet)
-router.register('user', viewsets.UserViewSet)
-router.register('match-user', viewsets.MatchUserViewSet)
+router.register('questions', viewsets.QuestionViewSet, basename='question')
+router.register('options', viewsets.OptionViewSet, basename='option')
+router.register('question-groups', viewsets.QuestionGroupViewSet, basename='question-group')
+router.register('matches', viewsets.MatchViewSet, basename='match')
+router.register('users', viewsets.UserViewSet, basename='user')
+router.register('match-users', viewsets.MatchUserViewSet, basename='match-user')
 
 urlpatterns = router.urls

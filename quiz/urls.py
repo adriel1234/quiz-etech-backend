@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/token/api-auth/', include('rest_framework.urls')),
     path('api/token/register/', RegisterView.as_view(), name='register'),
     path('api/', include('core.urls')),
+
 ]
