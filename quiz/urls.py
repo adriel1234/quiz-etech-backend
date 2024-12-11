@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt import views as jwt_views
-from core.views import RegisterView
+from core.views import RegisterView, ranking_by_match_api
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/token/api-auth/', include('rest_framework.urls')),
     path('api/token/register/', RegisterView.as_view(), name='register'),
     path('api/', include('core.urls')),
+    path('api/ranking/<int:match_id>/', ranking_by_match_api, name='ranking_by_match_api')
 ]
