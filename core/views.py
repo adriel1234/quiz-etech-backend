@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from .models import MatchUser,Match
+from .models import MatchUser, Match, QuestionGroup,Question
 
 
 class RegisterView(APIView):
@@ -27,6 +27,7 @@ class RegisterView(APIView):
         refresh = RefreshToken.for_user(user)
         return Response({"token": str(refresh.access_token), "name": user.first_name}, status=status.HTTP_201_CREATED)
 
+
 def ranking_by_match_api(request, match_id):
     # Verifica se o match existe
     match = get_object_or_404(Match, id=match_id)
@@ -46,3 +47,28 @@ def ranking_by_match_api(request, match_id):
 
     # Retorna os dados em formato JSON
     return JsonResponse(ranking_data, safe=False)
+
+
+
+
+def quiz_player(request, match_id):
+    # Obtém o objeto Match pelo ID
+    match = get_object_or_404(Match, id=match_id)
+    print("quiz", match.question_group)
+
+    # Obtém o grupo de perguntas (GroupQuestion) associado ao match
+    group_question = match.question_group
+
+    # Obtém as perguntas associadas a esse grupo
+    questions = group_question.questions_group_question.all()
+
+    # Formata as perguntas em um formato de lista de dicionários
+    questions_data = []
+    for question in questions:
+        questions_data.append({
+            'id': question.id,
+            'descrition': question.description,  # Exemplo de campo, você pode adicionar mais conforme necessário
+        })
+
+    # Retorna as perguntas em formato JSON
+    return JsonResponse(questions_data, safe=False)
