@@ -1,3 +1,5 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -81,6 +83,31 @@ def quiz_player(request, match_id):
     # Retorna o dicionário formatado como JSON
     return JsonResponse(match_data, safe=False)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_quiz(request, quiz_id):
+    quiz = get_object_or_404(Match, id=quiz_id)
+    match_user_id = request.GET.get('matchUserId')
+
+    response = {
+        'quiz': {
+            'id': quiz.id,
+            'title': quiz.description,
+            'questions': list(quiz.question_group.questions_group_question.all()),
+        }
+    }
+
+    if match_user_id:
+        match_user = get_object_or_404(MatchUser, id=match_user_id)
+        response['matchUser'] = {
+            'id': match_user.id,
+            'user': match_user.user.username,
+            'points': match_user.points,
+            'right_questions': match_user.right_questions,
+            'wrong_questions': match_user.wrong_questions,
+        }
+
+    return JsonResponse(response, status=200)
 def quiz_result(request, match_id):
     if request.method == 'POST':
         try:
@@ -112,3 +139,85 @@ def quiz_result(request, match_id):
         })
     else:
         return JsonResponse({"error": "Método não permitido"}, status=405)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_match_user(request):
+    data = request.data
+
+    # Verificar se os dados essenciais foram enviados
+    if not data.get('userName') and not data.get('userId'):
+        raise ValidationError('Nome de usuário ou ID de usuário é obrigatório')
+
+    if not data.get('match') or not data['match'].get('id'):
+        raise ValidationError('Match ID é obrigatório')
+
+    # Tentando obter o userName ou userId
+    user_name = data.get('userName')
+    user_id = data.get('userId')
+
+    # Criar ou recuperar o usuário baseado no nome
+    if user_name:
+        user, created = User.objects.get_or_create(username=user_name)
+        if created:
+            user.set_unusable_password()  # Define a senha como inutilizável
+            user.save()
+    elif user_id:
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuário não encontrado'}, status=404)
+    else:
+        return JsonResponse({'error': 'Nome de usuário ou ID de usuário é obrigatório'}, status=400)
+
+    # Verificar se o matchId foi fornecido
+    match_id = data.get('match', {}).get('id')
+    if not match_id:
+        return JsonResponse({'error': 'Match ID é obrigatório'}, status=400)
+
+    try:
+        # Buscar o match a partir do ID
+        match = Match.objects.get(id=match_id)
+
+        # Criar o MatchUser
+        match_user = MatchUser.objects.create(
+            user=user,
+            match=match,
+            points=data.get('points', 0),
+            right_questions=data.get('rightQuestions', 0),
+            wrong_questions=data.get('wrongQuestions', 0)
+        )
+
+        return JsonResponse({'id': match_user.id}, status=201)
+
+    except Match.DoesNotExist:
+        return JsonResponse({'error': 'Match não encontrado'}, status=404)
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_quiz_with_match_user(request, quiz_id, match_user_id):
+    # Buscar o Quiz pelo ID
+    quiz = get_object_or_404(Match, id=quiz_id)
+
+    # Buscar o MatchUser pelo ID
+    match_user = get_object_or_404(MatchUser, id=match_user_id)
+
+    # Retornar os dados do quiz e do MatchUser
+    return JsonResponse({
+        'quiz': {
+            'id': quiz.id,
+            'title': quiz.description,
+            'questions': list(quiz.question_group.questions_group_question.all()),
+        },
+        'matchUser': {
+            'id': match_user.id,
+            'user': match_user.user.username,
+            'points': match_user.points,
+            'right_questions': match_user.right_questions,
+            'wrong_questions': match_user.wrong_questions,
+        }
+    }, status=200)
