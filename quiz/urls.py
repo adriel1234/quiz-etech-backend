@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt import views as jwt_views
-from core.views import RegisterView, ranking_by_match_api,quiz_player,quiz_result, create_match_user,get_quiz_with_match_user
+from core.views import RegisterView, ranking_by_match_api,create_match_user,quiz_player,get_quiz_with_match_user
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,7 +29,6 @@ urlpatterns = [
     path('api/', include('core.urls')),
     path('api/ranking/<int:match_id>/', ranking_by_match_api, name='ranking_by_match_api'),
     path('api/quiz/<int:match_id>/', quiz_player, name='quiz_player'),
-    path('api/quizResults/', quiz_result, name='quiz_result'),
     path('api/match-users', create_match_user, name='create_match_user'),
     path('api/quiz/<int:quiz_id>/match-user/<int:match_user_id>/', get_quiz_with_match_user, name='get_quiz_with_match_user'),
 ]

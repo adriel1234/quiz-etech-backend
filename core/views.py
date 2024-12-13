@@ -51,96 +51,6 @@ def ranking_by_match_api(request, match_id):
     # Retorna os dados em formato JSON
     return JsonResponse(ranking_data, safe=False)
 
-
-def quiz_player(request, match_id):
-    # Obtém o objeto Match pelo ID
-    match = get_object_or_404(Match, id=match_id)
-
-    # Obtém o grupo de perguntas (GroupQuestion) associado ao match
-    group_question = match.question_group
-
-    # Obtém as perguntas associadas a esse grupo
-    questions = group_question.questions_group_question.all()
-
-    # Formata as perguntas em um formato de lista de dicionários
-    questions_data = []
-    for question in questions:
-        questions_data.append({
-            'id': question.id,
-            'description': question.description,  # Exemplo de campo, você pode adicionar mais conforme necessário
-        })
-
-    # Cria um dicionário com os dados do match e as perguntas associadas
-    match_data = {
-        'id': match.id,
-        'modified_at': match.modified_at.isoformat(),  # A data é convertida para string no formato ISO
-        'time_per_question': match.time_per_question,
-        'description': match.description,
-        'question_group': match.question_group.id,  # Retorna o ID do grupo de perguntas
-        'questions': questions_data  # Inclui as perguntas associadas ao match
-    }
-
-    # Retorna o dicionário formatado como JSON
-    return JsonResponse(match_data, safe=False)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_quiz(request, quiz_id):
-    quiz = get_object_or_404(Match, id=quiz_id)
-    match_user_id = request.GET.get('matchUserId')
-
-    response = {
-        'quiz': {
-            'id': quiz.id,
-            'title': quiz.description,
-            'questions': list(quiz.question_group.questions_group_question.all()),
-        }
-    }
-
-    if match_user_id:
-        match_user = get_object_or_404(MatchUser, id=match_user_id)
-        response['matchUser'] = {
-            'id': match_user.id,
-            'user': match_user.user.username,
-            'points': match_user.points,
-            'right_questions': match_user.right_questions,
-            'wrong_questions': match_user.wrong_questions,
-        }
-
-    return JsonResponse(response, status=200)
-def quiz_result(request, match_id):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            user_name = data.get('name')
-            code = data.get('code')
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-        if not user_name:
-            return JsonResponse({"error": "Nome é obrigatório"}, status=400)
-
-        # Get the match associated with the code (assuming 'code' corresponds to 'id')
-        match = get_object_or_404(Match, id=code)
-
-        # Create the user
-        user = User.objects.create_user(username=user_name, password=None)
-
-        # Save the user's match
-        user.profile.match = match
-        user.profile.save()
-
-        return JsonResponse({
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "match_id": match.id
-            }
-        })
-    else:
-        return JsonResponse({"error": "Método não permitido"}, status=405)
-
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_match_user(request):
@@ -153,7 +63,7 @@ def create_match_user(request):
     if not data.get('match') or not data['match'].get('id'):
         raise ValidationError('Match ID é obrigatório')
 
-    # Tentando obter o userName ou userId
+    # Tentando obter o usrName ou userId
     user_name = data.get('userName')
     user_id = data.get('userId')
 
@@ -194,8 +104,78 @@ def create_match_user(request):
     except Match.DoesNotExist:
         return JsonResponse({'error': 'Match não encontrado'}, status=404)
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+def quiz_player(request, match_id):
+    # Obtém o objeto Match pelo ID
+    match = get_object_or_404(Match, id=match_id)
+
+    # Obtém o grupo de perguntas (GroupQuestion) associado ao match
+    group_question = match.question_group
+
+    # Obtém as perguntas associadas a esse grupo
+    questions = group_question.questions_group_question.all()
+
+    # Formata as perguntas em um formato de lista de dicionários, incluindo as opções
+    questions_data = []
+    for question in questions:
+        questions_data.append({
+            'id': question.id,
+            'description': question.description,  # Descrição da pergunta
+            'options': [
+                {'description': option.description, 'correct': option.correct}
+                for option in question.options.all()
+            ]  # Opções da pergunta
+        })
+
+    # Cria um dicionário com os dados do match e as perguntas associadas
+    match_data = {
+        'id': match.id,
+        'modified_at': match.modified_at.isoformat(),  # A data é convertida para string no formato ISO
+        'time_per_question': match.time_per_question,
+        'description': match.description,
+        'question_group': match.question_group.id,  # Retorna o ID do grupo de perguntas
+        'questions': questions_data  # Inclui as perguntas e opções associadas ao match
+    }
+
+    # Retorna o dicionário formatado como JSON
+    return JsonResponse(match_data, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_quiz(request, quiz_id):
+    quiz = get_object_or_404(Match, id=quiz_id)
+    match_user_id = request.GET.get('matchUserId')
+
+    # Formata a resposta para incluir as opções das perguntas
+    response = {
+        'quiz': {
+            'id': quiz.id,
+            'title': quiz.description,
+            'questions': [
+                {
+                    'id': question.id,
+                    'description': question.description,
+                    'options': [
+                        {'description': option.description, 'correct': option.correct}
+                        for option in question.options.all()
+                    ]  # Opções associadas à pergunta
+                }
+                for question in quiz.question_group.questions_group_question.all()
+            ]
+        }
+    }
+
+    if match_user_id:
+        match_user = get_object_or_404(MatchUser, id=match_user_id)
+        response['matchUser'] = {
+            'id': match_user.id,
+            'user': match_user.user.username,
+            'points': match_user.points,
+            'right_questions': match_user.right_questions,
+            'wrong_questions': match_user.wrong_questions,
+        }
+
+    return JsonResponse(response, status=200)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -206,12 +186,22 @@ def get_quiz_with_match_user(request, quiz_id, match_user_id):
     # Buscar o MatchUser pelo ID
     match_user = get_object_or_404(MatchUser, id=match_user_id)
 
-    # Retornar os dados do quiz e do MatchUser
-    return JsonResponse({
+    # Preparar os dados para o retorno
+    response = {
         'quiz': {
             'id': quiz.id,
             'title': quiz.description,
-            'questions': list(quiz.question_group.questions_group_question.all()),
+            'questions': [
+                {
+                    'id': question.id,
+                    'description': question.description,
+                    'options': [
+                        {'description': option.description, 'correct': option.correct}
+                        for option in question.options.all()
+                    ]  # Opções associadas à pergunta
+                }
+                for question in quiz.question_group.questions_group_question.all()
+            ]
         },
         'matchUser': {
             'id': match_user.id,
@@ -220,4 +210,6 @@ def get_quiz_with_match_user(request, quiz_id, match_user_id):
             'right_questions': match_user.right_questions,
             'wrong_questions': match_user.wrong_questions,
         }
-    }, status=200)
+    }
+
+    return JsonResponse(response, status=200)
