@@ -154,7 +154,7 @@ CORS_ALLOW_METHODS = (
     "PUT",
 )
 
-
+CORS_ALLOWED_ORIGINS = ["*"]
 
 CORS_ALLOW_HEADERS = [
     'Authorization',

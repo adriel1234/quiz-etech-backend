@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
+import json
 from django.shortcuts import get_object_or_404
 from .models import MatchUser, Match, QuestionGroup,Question
 
@@ -80,30 +81,28 @@ def quiz_player(request, match_id):
     # Retorna o dicionário formatado como JSON
     return JsonResponse(match_data, safe=False)
 
-
 def quiz_result(request, match_id):
     if request.method == 'POST':
-        # Receber o nome do usuário no corpo da requisição
-        user_name = request.POST.get('name')
+        try:
+            data = json.loads(request.body)
+            user_name = data.get('name')
+            code = data.get('code')
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
 
         if not user_name:
             return JsonResponse({"error": "Nome é obrigatório"}, status=400)
 
-        # Obter o match associado ao match_id
-        match = get_object_or_404(Match, id=match_id)
+        # Get the match associated with the code (assuming 'code' corresponds to 'id')
+        match = get_object_or_404(Match, id=code)
 
-        # Criar o novo usuário no Django sem senha
+        # Create the user
         user = User.objects.create_user(username=user_name, password=None)
 
-        # Associar o usuário ao match, se necessário. Aqui você pode adicionar um relacionamento, como um campo ManyToMany.
-        # Exemplo, se o relacionamento entre Match e User for necessário:
-        # match.users.add(user)  # Caso tenha um campo ManyToMany chamado 'users' no modelo 'Match'
-
-        # Caso não seja necessário associar diretamente, apenas gravar o match_id:
-        user.profile.match = match  # Supondo que 'profile' seja um modelo relacionado ao User
+        # Save the user's match
+        user.profile.match = match
         user.profile.save()
 
-        # Retornar a resposta com dados do novo usuário
         return JsonResponse({
             "user": {
                 "id": user.id,
