@@ -16,10 +16,11 @@ IN = 'in'
 
 class QuestionFilter(filters.FilterSet):
     description = filters.CharFilter(lookup_expr=LIKE)
+    group_id = filters.NumberFilter(field_name='questiongroup__id')  # Filtro pelo ID do grupo de questões
 
     class Meta:
         model = models.Question
-        fields = ['description']
+        fields = ['description', 'group_id']
 
 
 class OptionFilter(filters.FilterSet):
