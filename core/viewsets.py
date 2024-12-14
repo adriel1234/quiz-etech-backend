@@ -31,6 +31,13 @@ class MatchViewSet(viewsets.ModelViewSet):
     filterset_class = filters.MatchFilter
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            permission_classes = [permissions.AllowAny]  # Allow GET requests for all users
+        else:
+            permission_classes = [permissions.IsAuthenticated]  # Other actions require authentication
+        return [permission() for permission in permission_classes]
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
