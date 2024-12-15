@@ -79,3 +79,9 @@ class MatchUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MatchUser
         exclude = ['created_at']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']

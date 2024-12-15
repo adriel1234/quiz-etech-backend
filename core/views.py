@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -10,6 +10,8 @@ from django.http import JsonResponse
 import json
 from django.shortcuts import get_object_or_404
 from .models import MatchUser, Match, QuestionGroup,Question
+from .serializers import UserSerializer
+
 
 
 class RegisterView(APIView):
@@ -99,83 +101,40 @@ def create_match_user(request):
             wrong_questions=data.get('wrongQuestions', 0)
         )
 
-        return JsonResponse({'id': match_user.id}, status=201)
+        # Retorna os dados no formato desejado
+        response_data = {
+            'id': match_user.id,
+            'modified_at': match_user.modified_at.isoformat(),  # Formato ISO para 'modified_at'
+            'points': match_user.points,
+            'right_questions': match_user.right_questions,
+            'wrong_questions': match_user.wrong_questions,
+            'user': match_user.user.id,  # ID do usuário
+            'match': match_user.match.id,  # ID do match
+        }
+
+        return JsonResponse(response_data, status=201)
 
     except Match.DoesNotExist:
         return JsonResponse({'error': 'Match não encontrado'}, status=404)
 
 def quiz_player(request, match_id):
     # Obtém o objeto Match pelo ID
-    match = get_object_or_404(Match, id=match_id)
+    match = get_object_or_404(MatchUser, id=match_id)
 
-    # Obtém o grupo de perguntas (GroupQuestion) associado ao match
-    group_question = match.question_group
-
-    # Obtém as perguntas associadas a esse grupo
-    questions = group_question.questions_group_question.all()
-
-    # Formata as perguntas em um formato de lista de dicionários, incluindo as opções
-    questions_data = []
-    for question in questions:
-        questions_data.append({
-            'id': question.id,
-            'description': question.description,  # Descrição da pergunta
-            'options': [
-                {'description': option.description, 'correct': option.correct}
-                for option in question.options.all()
-            ]  # Opções da pergunta
-        })
-
-    # Cria um dicionário com os dados do match e as perguntas associadas
+    # Define o dicionário com os dados no formato desejado
     match_data = {
-        'id': match.id,
-        'modified_at': match.modified_at.isoformat(),  # A data é convertida para string no formato ISO
-        'time_per_question': match.time_per_question,
-        'description': match.description,
-        'question_group': match.question_group.id,  # Retorna o ID do grupo de perguntas
-        'questions': questions_data  # Inclui as perguntas e opções associadas ao match
+        "id": match.id,
+        "modified_at": match.modified_at.isoformat(),  # Data formatada no padrão ISO
+        "points": match.points,  # Pontuação inicial
+        "right_questions": match.right_questions,  # Perguntas corretas inicial
+        "wrong_questions": match.wrong_questions,  # Perguntas erradas inicial
+        "user": match.user.id,  # ID do usuário autenticado
+        "match": match.id  # ID do match
     }
 
     # Retorna o dicionário formatado como JSON
     return JsonResponse(match_data, safe=False)
 
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_quiz(request, quiz_id):
-    quiz = get_object_or_404(Match, id=quiz_id)
-    match_user_id = request.GET.get('matchUserId')
-
-    # Formata a resposta para incluir as opções das perguntas
-    response = {
-        'quiz': {
-            'id': quiz.id,
-            'title': quiz.description,
-            'questions': [
-                {
-                    'id': question.id,
-                    'description': question.description,
-                    'options': [
-                        {'description': option.description, 'correct': option.correct}
-                        for option in question.options.all()
-                    ]  # Opções associadas à pergunta
-                }
-                for question in quiz.question_group.questions_group_question.all()
-            ]
-        }
-    }
-
-    if match_user_id:
-        match_user = get_object_or_404(MatchUser, id=match_user_id)
-        response['matchUser'] = {
-            'id': match_user.id,
-            'user': match_user.user.username,
-            'points': match_user.points,
-            'right_questions': match_user.right_questions,
-            'wrong_questions': match_user.wrong_questions,
-        }
-
-    return JsonResponse(response, status=200)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -213,3 +172,17 @@ def get_quiz_with_match_user(request, quiz_id, match_user_id):
     }
 
     return JsonResponse(response, status=200)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_by_id(request, user_id):
+    """
+    Retorna o usuário baseado no userId.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        raise NotFound('Usuário não encontrado.')
+
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
