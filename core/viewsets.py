@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions
 from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
 
 from core import models, serializers, filters
 
@@ -7,7 +8,17 @@ class QuestionViewSet(viewsets.ModelViewSet):
     queryset = models.Question.objects.prefetch_related('options').all().order_by('id')
     serializer_class = serializers.QuestionSerializer
     filterset_class = filters.QuestionFilter
+    # permission_classes = [AllowAny]
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        # Permitir acesso irrestrito (AllowAny) para métodos de leitura (GET, HEAD, OPTIONS)
+        if self.action in ['retrieve', 'list']:
+            permission_classes = [AllowAny]
+        else:
+            # Exigir autenticação para outras ações (POST, PUT, DELETE, etc.)
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class OptionViewSet(viewsets.ModelViewSet):
