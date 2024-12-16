@@ -492,8 +492,62 @@ VALUES
 (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, false, 'Urbanização acelerada', (SELECT id FROM public.question WHERE tx_question = 'Qual foi o impacto da chegada dos colonizadores europeus na Amazônia?')),
 (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, false, 'Melhoria das condições de vida dos povos nativos', (SELECT id FROM public.question WHERE tx_question = 'Qual foi o impacto da chegada dos colonizadores europeus na Amazônia?'));
 
+-- cadastro question_group_question esportes
+INSERT INTO public.question_group_question (questiongroup_id, question_id)
+VALUES 
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9),
+(1, 10);
 
-        
+-- cadastro question_group_question cultura região norte
+INSERT INTO public.question_group_question (questiongroup_id, question_id)
+VALUES 
+(2, 11),
+(2, 12),
+(2, 13),
+(2, 14),
+(2, 15),
+(2, 16),
+(2, 17),
+(2, 18),
+(2, 19),
+(2, 20);
+
+-- cadastro question_group_question conhecimento gerais
+INSERT INTO public.question_group_question (questiongroup_id, question_id)
+VALUES 
+(3, 21),
+(3, 22),
+(3, 23),
+(3, 24),
+(3, 25),
+(3, 26),
+(3, 27),
+(3, 28),
+(3, 29),
+(3, 30);
+
+-- cadastro question_group_question História da região Norte
+INSERT INTO public.question_group_question (questiongroup_id, question_id)
+VALUES 
+(4, 31),
+(4, 32),
+(4, 33),
+(4, 34),
+(4, 35),
+(4, 36),
+(4, 37),
+(4, 38),
+(4, 39),
+(4, 40);
+
         """),
 
     ]
