@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
-
+from rest_framework.permissions import BasePermission
 from core import models, serializers, filters
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -57,8 +57,18 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+
+
+class AllowPUTPATCHOnly(BasePermission):
+    def has_permission(self, request, view):
+        # Permite PUT e PATCH para qualquer um
+        if request.method in ['PUT', 'PATCH']:
+            return True
+        # Restringe outros métodos
+        return False
+
 class MatchUserViewSet(viewsets.ModelViewSet):
     queryset = models.MatchUser.objects.all()
     serializer_class = serializers.MatchUserSerializer
     filterset_class = filters.MatchUserFilter
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowPUTPATCHOnly]
