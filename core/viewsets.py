@@ -57,8 +57,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-
-
 class AllowPUTPATCHOnly(BasePermission):
     def has_permission(self, request, view):
         # Permite PUT e PATCH para qualquer um
